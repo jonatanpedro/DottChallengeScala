@@ -8,7 +8,7 @@ import com.zeroquo.dottchallengescala.usecase.entity.Product
 import scala.annotation.tailrec
 import scala.util.Random
 
-object ItemDataProvider {
+class ItemDataProvider {
 
   def generateRandomItemsList: List[Item] = {
 

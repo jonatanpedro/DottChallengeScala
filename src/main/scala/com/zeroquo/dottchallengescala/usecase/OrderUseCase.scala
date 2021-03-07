@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import com.zeroquo.dottchallengescala.dataprovider.OrderDataProvider
 import com.zeroquo.dottchallengescala.usecase.entity.{Interval, Order}
 
-class OrderUseCase {
+class OrderUseCase (orderDataProvider : OrderDataProvider = new OrderDataProvider) {
 
   def reportOldProductsSoldByDate(startDate: LocalDateTime, endDate: LocalDateTime,
                                   interval: List[Interval] = Nil): String = {
@@ -14,19 +14,16 @@ class OrderUseCase {
       case (Some(messageDate), None) => messageDate
       case (None, Some(messageInterval)) => messageInterval
       case (None, None) =>
-        val listOrders = OrderDataProvider.getAllOrders
+        val listOrders = orderDataProvider.getAllOrders
+
         val value = listOrders.filter(order => order.orderDate.isAfter(startDate))
           .filter(order => order.orderDate.isBefore(endDate))
-
-        println(value.mkString("\n"))
-        println(value.length)
 
         groupOrdersByInterval(value, interval)
     }
   }
 
   private def groupOrdersByInterval(orders: List[Order], intervals: List[Interval]): String = {
-
     intervals
       .map(interval => {
         var result = 0

@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom
 import com.zeroquo.dottchallengescala.usecase.entity.Item
 import com.zeroquo.dottchallengescala.usecase.entity.Order
 
-object OrderDataProvider {
+class OrderDataProvider (itemDataProvider: ItemDataProvider = new ItemDataProvider()){
 
   def getAllOrders : List[Order] = generateOrders
 
@@ -24,8 +24,8 @@ object OrderDataProvider {
     }
 
     getNames.map(name => {
-      val list = ItemDataProvider.generateRandomItemsList
-      Order(customerName = name, contact = s"$name@mail.com", shippingAddress = "someAdress", calculatePrice(list), getRandomOrderDate, list)
+      val list = itemDataProvider.generateRandomItemsList
+      Order(customerName = name, contact = s"$name@mail.com", shippingAddress = "someAddress", calculatePrice(list), getRandomOrderDate, list)
     })
   }
 
@@ -54,7 +54,7 @@ object OrderDataProvider {
     "Gustav","Louie","Morgan","Ned","Van","Ambrose","Chauncey","Elisha","Ferdinand","General","Julian","Kenneth",
     "Mitchell","Allie","Josh","Judson","Lyman","Napoleon","Pedro","Berry","Dewitt","Ervin","Forest","Lynn","Pink",
     "Ruben","Sanford","Ward","Douglas","Ole","Omer","Ulysses","Walker","Wilbert","Adelbert","Benjiman","Ivan","Jonas",
-    "Major","Abner","Archibald","Caleb","Clint","Dudley","Granville","King","Mary","Merton","Antonio","Bennie","Carroll",
+    "Major","Abner","Archer","Caleb","Clint","Dudley","Granville","King","Mary","Merton","Antonio","Bennie","Carroll",
     "Freeman","Josiah","Milo","Royal","Dick","Earle","Elza","Emerson","Fletcher","Judge","Laurence","Neil","Roger",
     "Seth","Glen","Hugo","Jimmie","Johnnie","Washington","Elwood","Gust","Harmon","Jordan","Simeon","Wayne","Wilber",
     "Clem","Evan","Frederic","Irwin","Junius","Lafayette","Loren","Madison","Mason","Orval","Abram","Aubrey","Elliott",
