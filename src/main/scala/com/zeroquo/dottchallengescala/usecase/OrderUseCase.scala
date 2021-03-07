@@ -5,10 +5,9 @@ import java.time.LocalDateTime
 import com.zeroquo.dottchallengescala.dataprovider.OrderDataProvider
 import com.zeroquo.dottchallengescala.usecase.entity.{Interval, Order}
 
-class OrderUseCase (orderDataProvider : OrderDataProvider = new OrderDataProvider) {
+class OrderUseCase(orderDataProvider: OrderDataProvider = new OrderDataProvider) {
 
-  def reportOldProductsSoldByDate(startDate: LocalDateTime, endDate: LocalDateTime,
-                                  interval: List[Interval] = Nil): String = {
+  def reportOldProductsSoldByDate(startDate: LocalDateTime, endDate: LocalDateTime, interval: List[Interval]): String = {
     (verifyDates(startDate, endDate), verifyInterval(interval)) match {
       case (Some(messageDate), Some(messageInterval)) => messageDate + messageInterval
       case (Some(messageDate), None) => messageDate
@@ -24,20 +23,48 @@ class OrderUseCase (orderDataProvider : OrderDataProvider = new OrderDataProvide
   }
 
   private def groupOrdersByInterval(orders: List[Order], intervals: List[Interval]): String = {
+
+    val firstDayOfThisMonth = LocalDateTime.now.withDayOfMonth(1)
+      .withHour(0)
+      .withMinute(0)
+      .withSecond(0)
+      .withNano(0)
+
     intervals
       .map(interval => {
         var result = 0
         if (interval.isRangeType) {
-          result = orders.count(order => order.items.
-            exists(item => item.product.creationDate.isBefore(LocalDateTime.now.minusMonths(interval.startValue)) &&
-              item.product.creationDate.isAfter(LocalDateTime.now.minusMonths(interval.endValue))))
+          val list = orders
+            .filter((order: Order) => order.items
+              .exists(item => item.product.creationDate.isBefore(firstDayOfThisMonth.minusMonths(interval.startValue)) ||
+                item.product.creationDate.isEqual(firstDayOfThisMonth.minusMonths(interval.startValue)) &&
+                item.product.creationDate.isAfter(firstDayOfThisMonth.minusMonths(interval.endValue)) ||
+                item.product.creationDate.isEqual(firstDayOfThisMonth.minusMonths(interval.endValue)))
+            )
+
+          //println(s"\n\n ${interval.rawValue} \n" + list.mkString("\n") + "\n\n")
+
+          result = list.length
         } else {
-          if (interval.isComparatorGreaterThan)
-            result = orders.count((order: Order) => order.items
-              .exists(item => item.product.creationDate.isBefore(LocalDateTime.now.minusMonths(interval.edgeValue))))
-          else if (interval.isComparatorLessThan)
-            result = orders.count((order: Order) => order.items
-              .exists(item => item.product.creationDate.isAfter(LocalDateTime.now.minusMonths(interval.edgeValue))))
+          if (interval.isComparatorGreaterThan) {
+
+            val list = orders.filter((order: Order) => order.items
+              .exists(item => item.product.creationDate.isBefore(firstDayOfThisMonth.minusMonths(interval.edgeValue)) ||
+                item.product.creationDate.isEqual(firstDayOfThisMonth.minusMonths(interval.edgeValue))))
+
+            //println(s"\n\n ${interval.rawValue} \n" + list.mkString("\n") + "\n\n")
+
+            result = list.length
+          } else if (interval.isComparatorLessThan) {
+
+            val list = orders.filter((order: Order) => order.items
+              .exists(item => item.product.creationDate.isAfter(firstDayOfThisMonth.minusMonths(interval.edgeValue)) ||
+                item.product.creationDate.isEqual(firstDayOfThisMonth.minusMonths(interval.edgeValue))))
+
+            //println(s"\n\n ${interval.rawValue} \n" + list.mkString("\n") + "\n\n")
+
+            result = list.length
+          }
         }
         s"${interval.rawValue} months: $result"
       })
