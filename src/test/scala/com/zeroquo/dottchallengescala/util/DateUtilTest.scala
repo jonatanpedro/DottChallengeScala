@@ -18,19 +18,9 @@ class DateUtilTest extends AnyFlatSpec {
     assert(result.getMinute == 51)
   }
 
-  "DateUtil" should "return a date with a custom format" in {
-
-    val result = DateUtil.convertStringToLocalDateTime("2021-03-07", "yyyy-MM-dd")
-
-    assert(result.isInstanceOf[LocalDateTime])
-    assert(result.getMonthValue == 3)
-    assert(result.getDayOfMonth == 7)
-    assert(result.getYear == 2021)
-  }
-
   "DateUtil" should "return actual date when the date is out of format" in {
 
-    val result = DateUtil.convertStringToLocalDateTime("202-03-07", "yyyy-MM-dd")
+    val result = DateUtil.convertStringToLocalDateTime("202-03-07")
 
     assert(result.isInstanceOf[LocalDateTime])
     assert(result.getYear == 2021)
